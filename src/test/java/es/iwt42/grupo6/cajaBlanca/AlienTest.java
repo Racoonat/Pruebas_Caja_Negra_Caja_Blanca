@@ -13,50 +13,84 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class AlienTest {
 
-        @Test
-        @DisplayName("CB_INITALIEN_01: El constructor inicializa (x, y), la imagen y la Bomb")
-        void testInitAlienViaConstructor() {
-            int inputX = 80;
-            int inputY = 120;
+    // método act
 
-            Alien alien = new Alien(inputX, inputY);
+    @Test
+    @DisplayName("CB_ALIEN_ACT_01: (Path 1) act() ejecuta this.x -= direction")
+    void testActMovesAlienHorizontally_Path1() {
+        Alien alien = new Alien(50, 200);
 
-            // (1) Posición inicial
-            assertEquals(inputX, alien.getX(), "La X inicial del alien no se estableció correctamente");
-            assertEquals(inputY, alien.getY(), "La Y inicial del alien no se estableció correctamente");
+        alien.act(5);
 
-            // (2) Imagen cargada
-            assertNotNull(alien.getImage(), "La imagen del alien no se cargó (debería ser 'alien.png')");
+        assertEquals(45, alien.getX(), "Path 1 (A->B->C): Se esperaba x=45");
+        assertEquals(200, alien.getY(), "Path 1 (A->B->C): 'act' no debe modificar Y");
+    }
 
-            // (3) Bomb creada y en estado esperado
-            Alien.Bomb bomb = alien.getBomb();
-            assertNotNull(bomb, "La bomba no fue inicializada en el constructor del alien");
-            assertEquals(inputX, bomb.getX(), "La X inicial de la bomba no coincide con la del alien");
-            assertEquals(inputY, bomb.getY(), "La Y inicial de la bomba no coincide con la del alien");
-            assertNotNull(bomb.getImage(), "La imagen de la bomba no se cargó (debería ser 'bomb.png')");
-            assertTrue(bomb.isDestroyed(), "La bomba debería inicializarse como 'destroyed = true'");
-        }
 
-        @Test
-        @DisplayName("CB_ALIEN_ACT_01: act() desplaza al alien según 'direction' (positivo, negativo, cero)")
-        void testActMovesAlienHorizontally() {
-            Alien alien = new Alien(50, 200);
+    //método initAlien
 
-            // Movimiento positivo
-            alien.act(5);
-            assertEquals(55, alien.getX(), "act(5) no desplazó correctamente al alien hacia la derecha");
-            assertEquals(200, alien.getY(), "act() no debería modificar la coordenada Y");
+    @Test
+    @DisplayName("CB_INIT_PATH_1 (A-C-D-F-G-I-J-L-M): x e y válidos (Camino Base)")
+    void testInitAlien_Path1_Valid() {
+        // Entrada: x=100, y=100
+        // Caminos: if(x>358) F, if(x<0) F, if(y>350) F, if(y<0) F -> else T
+        Alien alien = new Alien(100, 100);
 
-            // Movimiento negativo
-            alien.act(-3);
-            assertEquals(52, alien.getX(), "act(-3) no desplazó correctamente al alien hacia la izquierda");
-            assertEquals(200, alien.getY(), "act() no debería modificar la coordenada Y");
+        // Salida esperada (del código): el 'else' (Nodo L) asigna this.x=100, this.y=100
+        assertEquals(100, alien.getX(), "Path 1: X debería ser 100");
+        assertEquals(100, alien.getY(), "Path 1: Y debería ser 100");
+    }
 
-            // Movimiento nulo
-            alien.act(0);
-            assertEquals(52, alien.getX(), "act(0) no debería modificar la coordenada X");
-            assertEquals(200, alien.getY(), "act() no debería modificar la coordenada Y");
-        }
+    @Test
+    @DisplayName("CB_INIT_PATH_2 (A-B-D-F-G-I-J-L-M): x por encima del límite (>358)")
+    void testInitAlien_Path2_X_Above() {
+        // Entrada: x=400, y=100
+        // Caminos: if(x>358) T, if(x<0) F, if(y>350) F, if(y<0) F -> else T
+        Alien alien = new Alien(400, 100);
+
+        // Salida esperada (del código):
+        // Nodo B (if) -> this.x = 358
+        // Nodo L (else) -> this.x = 400 (Sobrescribe)
+        assertEquals(400, alien.getX(), "Path 2: X debería ser 400");
+        assertEquals(100, alien.getY(), "Path 2: Y debería ser 100");
+    }
+
+    @Test
+    @DisplayName("CB_INIT_PATH_3 (A-C-D-E-G-I-J-L-M): x por debajo del límite (<0)")
+    void testInitAlien_Path3_X_Below() {
+        // Entrada: x=-50, y=100
+        // Caminos: if(x>358) F, if(x<0) T, if(y>350) F, if(y<0) F -> else T
+        Alien alien = new Alien(-50, 100);
+
+        // Salida esperada (del código):
+        // Nodo E (if) -> this.x = 0
+        // Nodo L (else) -> this.x = -50 (Sobrescribe)
+        assertEquals(-50, alien.getX(), "Path 3: X debería ser -50");
+        assertEquals(100, alien.getY(), "Path 3: Y debería ser 100");
+    }
+
+    @Test
+    @DisplayName("CB_INIT_PATH_4 (A-C-D-F-G-H-J-L-M): y por encima del límite (>350)")
+    void testInitAlien_Path4_Y_Above() {
+        Alien alien = new Alien(100, 400);
+
+
+        assertEquals(100, alien.getX(), "Path 4: X debería ser 100");
+        assertEquals(400, alien.getY(), "Path 4: Y debería ser 400");
+    }
+
+    @Test
+    @DisplayName("CB_INIT_PATH_5 (A-C-D-F-G-I-J-K-M): y por debajo del límite (<0)")
+    void testInitAlien_Path5_Y_Below() {
+        Alien alien = new Alien(100, -50);
+        
+        assertEquals(0, alien.getX(), "Path 5: X debería ser 0");
+        assertEquals(0, alien.getY(), "Path 5: Y debería ser 0");
+    }
+
+
+
+    //método bomb
 
         @Test
         @DisplayName("CB_GETBOMB_01: getBomb() devuelve la misma instancia y permite cambiar 'destroyed'")

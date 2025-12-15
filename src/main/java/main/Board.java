@@ -332,6 +332,8 @@ public class Board extends JPanel {
      * cambia su imagen a explosión (<span class="alert-small">⛔🧪</span> no necesario evaluar este resultado), y se incrementa el contador `deaths`. 
      * Los disparos que salen del tablero por arriba se eliminan.</dd></dl>
      */
+
+    // CORRECCION NIVEL 3: El disparo no va en vertical, va diagonal a la izq
     private void update_shots() {
         if (this.shot.isVisible()) {
 
@@ -369,7 +371,7 @@ public class Board extends JPanel {
                 this.shot.die();
             } else {
                 this.shot.setY(y);
-                this.shot.setX(y);
+                this.shot.setX(y); // quitar esta linea
             }
         }
     }
@@ -397,12 +399,15 @@ public class Board extends JPanel {
      * {@link main.Commons#GROUND} + {@link main.Commons#ALIEN_HEIGHT}), 
      * el juego termina estableciendo el mensaje "Invasion!".</dd></dl>
      */
+
+    // CORRECCION NIVEL 3: Defecto de Lógica de Movimiento Alien. no rebotan al tocar el límite dcho del tablero
+    // CORRECCION NIVEL 3: Defecto de Condición de Derrota. no se da derrota cuando tocan el suelo
     private void update_aliens(){
         for (Alien alien : this.aliens) {
 
             int x = alien.getX();
 
-            if (x >= Commons.BOARD_WIDTH - Commons.BORDER_RIGHT && direction == -1) {
+            if (x >= Commons.BOARD_WIDTH - Commons.BORDER_RIGHT && direction == -1 /* cambiar a 1 */) {
 
                 direction = -1;
 
@@ -440,7 +445,7 @@ public class Board extends JPanel {
                 int y = alien.getY();
 
                 if (y > Commons.GROUND + Commons.ALIEN_HEIGHT) {
-                    inGame = true;
+                    inGame = true; // cambiar al false
                     message = "Invasion!";
                 }
 
@@ -477,15 +482,17 @@ public class Board extends JPanel {
      * Las bombas que alcanzan el suelo (límite calculado con {@link main.Commons#GROUND} - 
      * {@link main.Commons#BOMB_HEIGHT}) se marcan como destruidas.</dd></dl>
      */
+    // CORRECCION NIVEL 3: Frecuencia de Bombardeo
+    // CORRECCION NIVEL 3: Gravedad Invertida
     private void update_bomb(){
         var generator = new Random();
 
         for (Alien alien : this.aliens) {
 
-            int rand = generator.nextInt(15);
+            int rand = generator.nextInt(15); // demasiado alto
             Alien.Bomb bomb = alien.getBomb();
 
-            if (rand != Commons.CHANCE && alien.isVisible() && bomb.isDestroyed()) {
+            if (rand != /* cambiar a == */Commons.CHANCE && alien.isVisible() && bomb.isDestroyed()) {
 
                 bomb.setDestroyed(false);
                 bomb.setX(alien.getX());
@@ -513,7 +520,7 @@ public class Board extends JPanel {
 
             if (!bomb.isDestroyed()) {
 
-                bomb.setY(bomb.getY() - Commons.BOMB_SPEED);
+                bomb.setY(bomb.getY() - Commons.BOMB_SPEED); // cambiar a +
 
                 if (bomb.getY() >= Commons.GROUND - Commons.BOMB_HEIGHT) {
 
@@ -560,6 +567,7 @@ public class Board extends JPanel {
         }
 
         @Override
+        // CORRECCION NIVEL 3: Parámetros de Disparo Invertidos
         public void keyPressed(KeyEvent e) {
 
             player.keyPressed(e);
@@ -575,7 +583,7 @@ public class Board extends JPanel {
 
                     if (!shot.isVisible()) {
 
-                        shot = new Shot(y, x);
+                        shot = new Shot(y, x); // cambiar a (x, y)
                     }
                 }
             }

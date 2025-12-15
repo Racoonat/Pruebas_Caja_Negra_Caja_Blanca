@@ -64,10 +64,12 @@ public class Player extends Sprite {
 
             x = 2;
         }
-
+        // CORRECCION NIVEL 3: Error de límites de pantalla (Defecto D-02)
+        // Antes: x = Commons.BOARD_WIDTH + 2 * width; (Esto sacaba al jugador de la pantalla)
+        // Cambio: Se ha sustituido el operador '+' por '-' para mantener al jugador dentro del límite.
         if (x >= Commons.BOARD_WIDTH - 2 * width) {
 
-            x = Commons.BOARD_WIDTH + 2 * width;
+            x = Commons.BOARD_WIDTH - 2 * width;
         }
     }
 

@@ -80,9 +80,14 @@ public class Alien extends Sprite {
      * <dl class="notes"><dt>Postcondición:</dt> <dd>La posición horizontal del alien se actualiza 
      * según la dirección especificada.</dd></dl>
      */
-    public void act(int direction) {
-
-        this.x -= direction;
+    /**
+     * CORRECCION NIVEL 3: Dirección invertida (Defecto CP-A-10)
+     * Antes: this.x -= direction; (Restar movía a la izquierda con dirección positiva)
+     * Cambio: Se usa += para que dirección positiva signifique incremento en el eje X.
+     */
+    public void act(int direction) 
+    {
+        this.x += direction;
     }
 
     /**
@@ -126,9 +131,14 @@ public class Alien extends Sprite {
          * Si el valor X o Y indicados superan el margen de la pantalla, se les asignará el valor máximo permitido.
          * Si se introduce algún valor negativo, será reemplazado por 0.
          * */
+        /**
+         * CORRECCION NIVEL 3: Defectos de Bomba (CP-B-10, CP-A-19)
+         * Cambios: 
+         * 1. La bomba ahora nace activa (destroyed = false)
+         */
         private void initBomb(int x, int y) {
 
-            setDestroyed(true);
+            setDestroyed(false); // La bomba comenzaba destruida
 
             if (x<= Commons.BOARD_WIDTH && y<= Commons.BOARD_HEIGHT) {
                 this.x += x;

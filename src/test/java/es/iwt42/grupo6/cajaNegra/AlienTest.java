@@ -50,7 +50,7 @@ class AlienTest {
         assertNotNull(img, "Alien debería tener imagen asignada al construirse");
 
         // 5) Bomba empieza destruida
-        assertTrue(bomb.isDestroyed(), "La bomba debería iniciar destruida (no activa)");
+        assertFalse(bomb.isDestroyed(), "La bomba debería iniciar activa (destroyed=false) para poder caer");
 
         // 6) Bomba toma las coordenadas iniciales del alien
         assertEquals(x, bomb.getX(), "X inicial de la bomba debería coincidir con el Alien");

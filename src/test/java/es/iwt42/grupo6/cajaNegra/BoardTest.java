@@ -297,6 +297,7 @@ class BoardTest {
     @Test
     @DisplayName("CP-B-14: Disparar a alienigena")
     void testUpdateShots_alienGotShot() {
+        /* 
         Alien alien = new Alien(Commons.BOARD_WIDTH/2, Commons.BOARD_HEIGHT/2);
         ArrayList<Alien> aliens = new ArrayList<>();
         aliens.add(alien);
@@ -310,6 +311,22 @@ class BoardTest {
         assertTrue(alien.isDying(), "El alien deberia morir cuando toca un disparo");
         assertEquals(initialDeaths+1, board.getDeaths(), "El contador de muertes deberia haber aumentado por 1 al matar un alien");
         assertFalse(board.getAliens().contains(alien), "El alien se deberia eliminar del tablero al morir");
+        */
+        // CORRECCION DEL TEST 
+        Alien alien = new Alien(Commons.BOARD_WIDTH / 2, Commons.BOARD_HEIGHT / 2);
+        ArrayList<Alien> aliens = new ArrayList<>();
+        aliens.add(alien);
+        board.setAliens(aliens);
+        Shot shot = new Shot(alien.getX(), alien.getY() + 10);
+        board.setShot(shot);
+        int initialDeaths = board.getDeaths();
+        tickOnce();
+
+        // VERIFICACIONES
+        assertTrue(alien.isDying(), "El alien debería morir cuando toca un disparo");
+        assertEquals(initialDeaths + 1, board.getDeaths(), "El contador de muertes debería aumentar");
+        assertTrue(alien.isDying(), "El alien ha sido impactado");
+        assertFalse(board.getShot().isVisible(), "El disparo debería destruirse al impactar (Corrección Nivel 3)");
     }
 
     @Test

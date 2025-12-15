@@ -353,6 +353,10 @@ public class Board extends JPanel {
                         alien.setImage(ii.getImage());
                         alien.setDying(true);
                         deaths++;
+                        // CORRECCION NIVEL 3: Defecto de Colisiones (CP-B-14)
+                        // Antes: El disparo seguía vivo atravesando al alien.
+                        // Cambio: El disparo debe destruirse al impactar.
+                        this.shot.die();
                         
                     }
                 }

@@ -37,10 +37,13 @@ public class Player extends Sprite {
         width = ii.getImage().getWidth(null);
         setImage(ii.getImage());
 
-        int START_X = 179;
+        //CORRECCION NIVEL 3: Posición inicial del jugador incorrecta (Defecto CP-B-10)
+        // Antes: se utilizaban números fijos 179 y 280 para las coordenadas X e Y
+        // Cambio: Se han sustituido por cálculos basados en las constantes del juego para centrar al jugador
+        int START_X = (Commons.BOARD_WIDTH / 2) - (width / 2);
         setX(START_X);
 
-        int START_Y = 280;
+        int START_Y = Commons.GROUND - height - 10;
         setY(START_Y);
     }
 

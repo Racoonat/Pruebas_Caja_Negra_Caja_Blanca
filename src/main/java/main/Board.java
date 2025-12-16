@@ -497,10 +497,13 @@ public class Board extends JPanel {
 
         for (Alien alien : this.aliens) {
 
-            int rand = generator.nextInt(15); // demasiado alto
+
+            int rand = generator.nextInt(15); 
             Alien.Bomb bomb = alien.getBomb();
 
-            if (rand != /* cambiar a == */Commons.CHANCE && alien.isVisible() && bomb.isDestroyed()) {
+            // CORRECCION NIVEL 3: Frecuencia de Bombardeo
+            //Se ha cambiado rand != Commons.CHANCE por rand == Commons.CHANCE para bajar la frecuencia del bombardeo
+            if (rand == Commons.CHANCE && alien.isVisible() && bomb.isDestroyed()) {
 
                 bomb.setDestroyed(false);
                 bomb.setX(alien.getX());

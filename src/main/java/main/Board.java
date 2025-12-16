@@ -296,7 +296,7 @@ public class Board extends JPanel {
      * ({@link main.Commons#NUMBER_OF_ALIENS_TO_DESTROY}), el juego se marca como finalizado, 
      * y se establece el mensaje "<code>Game won!</code>".</dd></dl>
      */
-    private void update() {
+    public void update() {
 
         if (deaths == Commons.NUMBER_OF_ALIENS_TO_DESTROY) {
 

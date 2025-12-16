@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class PlayerTest {
 
-     // Componente falso y final que se usa para poder crear un objeto KeyEvent.
+    // Componente falso y final que se usa para poder crear un objeto KeyEvent.
     private final Component dummyComponent = new Component() {};
     private Player player;
 

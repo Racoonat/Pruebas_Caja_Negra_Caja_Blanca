@@ -333,7 +333,7 @@ public class Board extends JPanel {
      * Los disparos que salen del tablero por arriba se eliminan.</dd></dl>
      */
 
-    // CORRECCION NIVEL 3: El disparo no va en vertical, va diagonal a la izq
+   
     private void update_shots() {
         if (this.shot.isVisible()) {
 
@@ -371,7 +371,10 @@ public class Board extends JPanel {
                 this.shot.die();
             } else {
                 this.shot.setY(y);
-                this.shot.setX(y); // quitar esta linea
+                // CORRECCION NIVEL 3: Trayectoria errónea del disparo (Defecto CP-B-15)
+                // Antes: this.shot.setX(y); (Esto provocaba un movimiento diagonal erróneo al vincular X con Y)
+                // Cambio: Se ha eliminado la línea para restringir el movimiento al eje vertical.
+                // this.shot.setX(y);
             }
         }
     }
@@ -445,7 +448,10 @@ public class Board extends JPanel {
                 int y = alien.getY();
 
                 if (y > Commons.GROUND + Commons.ALIEN_HEIGHT) {
-                    inGame = true; // cambiar al false
+                    // CORRECCION NIVEL 3: El juego no termina al invadir ()
+                    // Antes: inGame = true; (Mantenía el juego vivo infinitamente)
+                    // Cambio: Se establece false para terminar la partida.
+                    inGame = false;
                     message = "Invasion!";
                 }
 
@@ -520,7 +526,10 @@ public class Board extends JPanel {
 
             if (!bomb.isDestroyed()) {
 
-                bomb.setY(bomb.getY() - Commons.BOMB_SPEED); // cambiar a +
+                // CORRECCION NIVEL 3: Gravedad invertida en bombas ()
+                // Antes: bomb.getY() - Commons.BOMB_SPEED (Las bombas subían)
+                // Cambio: Se suma la velocidad para que caigan hacia el jugador
+                bomb.setY(bomb.getY() + Commons.BOMB_SPEED);
 
                 if (bomb.getY() >= Commons.GROUND - Commons.BOMB_HEIGHT) {
 
@@ -583,7 +592,10 @@ public class Board extends JPanel {
 
                     if (!shot.isVisible()) {
 
-                        shot = new Shot(y, x); // cambiar a (x, y)
+                        // CORRECCION NIVEL 3: Parámetros de disparo invertidos ()
+                        // Antes: shot = new Shot(y, x); (Coordenadas invertidas)
+                        // Cambio: Se pasan las coordenadas en el orden correcto (x, y).
+                        shot = new Shot(x, y);
                     }
                 }
             }

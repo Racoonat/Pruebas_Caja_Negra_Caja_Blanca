@@ -410,7 +410,9 @@ public class Board extends JPanel {
 
             int x = alien.getX();
 
-            if (x >= Commons.BOARD_WIDTH - Commons.BORDER_RIGHT && direction == -1 /* cambiar a 1 */) {
+            // CORRECCION NIVEL 3:El Alien no rebota al tocar el límite derecho del tablero
+            //Se ha cambiado direction != -1 por direction == 1 
+            if (x >= Commons.BOARD_WIDTH - Commons.BORDER_RIGHT && direction == 1) {
 
                 direction = -1;
 

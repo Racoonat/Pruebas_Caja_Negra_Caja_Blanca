@@ -140,7 +140,8 @@ public class Alien extends Sprite {
 
             setDestroyed(false); // La bomba comenzaba destruida
 
-            if (x<= Commons.BOARD_WIDTH && y<= Commons.BOARD_HEIGHT) {
+            if ( (x >= 0 && x <= Commons.BOARD_WIDTH)
+                    && (y >= 0 && y <= Commons.BOARD_HEIGHT)) {
                 this.x += x;
                 this.y += y;
             } else

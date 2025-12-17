@@ -137,18 +137,28 @@ public class Alien extends Sprite {
          * 1. La bomba ahora nace activa (destroyed = false)
          */
         private void initBomb(int x, int y) {
+            int sumaX = this.x + x;
+            int sumaY = this.y + y;
 
             setDestroyed(false); // La bomba comenzaba destruida
 
-            if ( (x >= 0 && x <= Commons.BOARD_WIDTH)
-                    && (y >= 0 && y <= Commons.BOARD_HEIGHT)) {
-                this.x += x;
-                this.y += y;
-            } else
-            {
+            /*Se ha sustituido el condicional que comprobaba si x e y se salían del límite derecho del
+            * tablero por uno que comprueba tanto el límite derecho como el izquierdo y, además, trata
+            * con cada coordinada de forma independiente*/
+
+            if (sumaX < 0)
+                this.x = 0;
+            else if (sumaX > Commons.BOARD_WIDTH)
                 this.x = Commons.BOARD_WIDTH;
+            else
+                this.x += x;
+
+            if (sumaY < 0)
+                this.y = 0;
+            else if (sumaY > Commons.BOARD_HEIGHT)
                 this.y = Commons.BOARD_HEIGHT;
-            }
+            else
+                this.y += y;
 
             var bombImg = "src/main/resources/images/bomb.png";
             var ii = new ImageIcon(bombImg);

@@ -137,8 +137,6 @@ public class Alien extends Sprite {
          * 1. La bomba ahora nace activa (destroyed = false)
          */
         private void initBomb(int x, int y) {
-            int sumaX = this.x + x;
-            int sumaY = this.y + y;
 
             setDestroyed(false); // La bomba comenzaba destruida
 
@@ -146,16 +144,16 @@ public class Alien extends Sprite {
             * tablero por uno que comprueba tanto el límite derecho como el izquierdo y, además, trata
             * con cada coordinada de forma independiente*/
 
-            if (sumaX < 0)
+            if (this.x + x < 0)
                 this.x = 0;
-            else if (sumaX > Commons.BOARD_WIDTH)
+            else if (this.x + x > Commons.BOARD_WIDTH)
                 this.x = Commons.BOARD_WIDTH;
             else
                 this.x += x;
 
-            if (sumaY < 0)
+            if (this.y + y < 0)
                 this.y = 0;
-            else if (sumaY > Commons.BOARD_HEIGHT)
+            else if (this.y + y > Commons.BOARD_HEIGHT)
                 this.y = Commons.BOARD_HEIGHT;
             else
                 this.y += y;

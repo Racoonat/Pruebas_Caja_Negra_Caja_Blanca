@@ -449,7 +449,12 @@ public class Board extends JPanel {
 
                 int y = alien.getY();
 
-                if (y > Commons.GROUND + Commons.ALIEN_HEIGHT) {
+                /*CORRECIÓN NIVEL 3: No se activaba la condición de invasión hasta que
+                el alien estuviera fuera del tablero
+                Antes: y > Commons.GROUND + Commons.ALIEN_HEIGHT
+                Cambio: Se ha cambiado '+' por '-'
+                * */
+                if (y >= Commons.GROUND - Commons.ALIEN_HEIGHT) {
                     // CORRECCION NIVEL 3: El juego no termina al invadir ()
                     // Antes: inGame = true; (Mantenía el juego vivo infinitamente)
                     // Cambio: Se establece false para terminar la partida.

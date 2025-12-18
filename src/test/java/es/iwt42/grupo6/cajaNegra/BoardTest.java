@@ -184,7 +184,7 @@ class BoardTest {
         tickOnce();
 
         assertEquals("Invasion!", board.getMessage(), "Mensaje esperado 'Invasion!'");
-        assertTrue(board.isInGame(), "Según la implementación, inGame se fija en true en invasión");
+        assertFalse(board.isInGame(), "Según la implementación, inGame se fija en false en invasión");
     }
 
     // CP-B-ALIENS-06: Alien NO visible con y>302 no dispara invasión (check solo para visibles)

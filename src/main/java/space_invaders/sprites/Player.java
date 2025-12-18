@@ -43,7 +43,8 @@ public class Player extends Sprite {
         int START_X = (Commons.BOARD_WIDTH / 2) - Commons.PLAYER_WIDTH;
         setX(START_X);
 
-        int START_Y = Commons.GROUND - Commons.ALIEN_HEIGHT;
+        //Se ha añadido 10px en la altura inicial tal y como se indica en la documentación
+        int START_Y = Commons.GROUND - 10 - Commons.PLAYER_HEIGHT;
         setY(START_Y);
     }
 

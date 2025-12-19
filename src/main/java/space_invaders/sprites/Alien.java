@@ -140,7 +140,8 @@ public class Alien extends Sprite {
 
             setDestroyed(false); // La bomba comenzaba destruida
 
-            /*Se ha sustituido el condicional que comprobaba si x e y se salían del límite derecho del
+            /*CORRECIÓN NIVEL 3:
+            Se ha sustituido el condicional que comprobaba si x e y se salían del límite derecho del
             * tablero por uno que comprueba tanto el límite derecho como el izquierdo y, además, trata
             * con cada coordinada de forma independiente*/
 

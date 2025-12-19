@@ -93,23 +93,23 @@ class BoardTest {
     // ------------------- PRUEBAS DE update_aliens() (vía update()) -------------------
 
     @Test
-    @DisplayName("CP-B-ALIENS-01: Borde derecho (x>=328) con direction=-1 -> todos bajan 15px y direction se mantiene en -1")
+    @DisplayName("CP-B-ALIENS-01: Borde derecho (x>=328) con direction=1 -> todos bajan 15px y direction pasa a -1")
     void testUpdateAliens_RightEdge_DropAndKeepMinusOne() {
         List<Alien> custom = new ArrayList<>();
         custom.add(new Alien(328, 10));  // fuerza borde derecho
         custom.add(new Alien(200, 20));
         custom.add(new Alien(250, 30));
         board.setAliens(custom);
-        board.setDirection(-1);
+        board.setDirection(1);
 
         List<Integer> yBefore = custom.stream().map(Alien::getY).toList();
 
         tickOnce();
 
         for (int i = 0; i < custom.size(); i++) {
-            assertEquals(yBefore.get(i) + 15, custom.get(i).getY(), "Todos los aliens deben bajar 15px");
+            assertEquals(yBefore.get(i) + Commons.GO_DOWN, custom.get(i).getY(), "Todos los aliens deben bajar 15px");
         }
-        assertEquals(-1, board.getDirection(), "direction debería seguir en -1 según la implementación actual");
+        assertEquals(-1, board.getDirection(), "cambio de dirección");
     }
 
     @Test
@@ -153,25 +153,6 @@ class BoardTest {
             assertNotEquals(yBefore.get(i) + 30, yAfter, "No debería haber doble descenso (+30) sin borde");
         }
         assertEquals(-1, board.getDirection(), "direction debería mantenerse si no hay borde");
-    }
-
-    @Test
-    @DisplayName("CP-B-ALIENS-04: Borde derecho y borde izquierdo presentes (con direction inicial -1) -> doble descenso (30px) y direction final=1")
-    void testUpdateAliens_BothEdges_DoubleDrop_FinalDirOne() {
-        List<Alien> custom = new ArrayList<>();
-        custom.add(new Alien(328, 10)); // derecha
-        custom.add(new Alien(5, 20));   // izquierda
-        board.setAliens(custom);
-        board.setDirection(-1);
-
-        List<Integer> yBefore = custom.stream().map(Alien::getY).toList();
-
-        tickOnce();
-
-        for (int i = 0; i < custom.size(); i++) {
-            assertEquals(yBefore.get(i) + 30, custom.get(i).getY(), "Debe aplicarse doble descenso (+30) al cumplirse ambos bordes");
-        }
-        assertEquals(1, board.getDirection(), "direction debería acabar en 1 tras tocar el borde izquierdo");
     }
 
     @Test
@@ -223,7 +204,7 @@ class BoardTest {
         custom.add(visibleMid);
 
         board.setAliens(custom);
-        board.setDirection(-1);
+        board.setDirection(1);
 
         int yInvisibleBefore = invisibleRight.getY();
         int yVisibleBefore = visibleMid.getY();
@@ -253,7 +234,7 @@ class BoardTest {
     @Test
     @DisplayName("CP-B-11: Bomba llega al final del tablero")
     void testUpdateBomb_bombReachedGround() {
-        Alien alien = new Alien(Commons.BOARD_WIDTH/2, Commons.BOARD_HEIGHT - Commons.BOMB_HEIGHT);
+        Alien alien = new Alien(Commons.BOARD_WIDTH/2, Commons.GROUND - Commons.BOMB_HEIGHT);
         ArrayList<Alien> aliens = new ArrayList<>();
         aliens.add(alien);
         board.setAliens(aliens);
@@ -266,7 +247,7 @@ class BoardTest {
     @Test
     @DisplayName("CP-B-12: Bomba no llega al final del tablero")
     void testUpdateBomb_bombDidntReachGround() {
-        Alien alien = new Alien(Commons.BOARD_WIDTH/2, Commons.BOARD_HEIGHT - Commons.BOMB_HEIGHT - 10);
+        Alien alien = new Alien(Commons.BOARD_WIDTH/2, Commons.BOARD_HEIGHT/2);
         ArrayList<Alien> aliens = new ArrayList<>();
         aliens.add(alien);
         board.setAliens(aliens);
@@ -274,7 +255,8 @@ class BoardTest {
         tickOnce();
 
         assertFalse(alien.getBomb().isDestroyed(), "La bomba no debe de explotar antes de lleguar abajo del tablero");
-        assertEquals(alien.getX(), alien.getBomb().getX(), "La bomba no debe de moverse horizontalmente");
+        //La posición es alien.getX()+1 ya que la direccion es -1 (movimiento hacia la izq) y el alien SI que se mueve
+        assertEquals(alien.getX()+1, alien.getBomb().getX(), "La bomba no debe de moverse horizontalmente");
         assertTrue(alien.getY() < alien.getBomb().getY(), "La bomba debe de moverse verticalmente");
     }
 

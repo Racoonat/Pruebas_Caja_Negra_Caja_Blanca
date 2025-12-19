@@ -14,6 +14,11 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Nivel 4: Pruebas de Integración
+ * Estrategia: Top-Down usando Mockito.
+ * Objetivo: Verificar MM-Paths entre Board y sus dependencias (Alien, Shot, Player).
+ */
 public class BoardIntegrationTest {
 
     private Board board;
@@ -35,7 +40,6 @@ public class BoardIntegrationTest {
         bombMock = mock(Alien.Bomb.class);
 
         // Configuración de relaciones entre mocks
-        // Cuando al alien se le pida su bomba, devolverá nuestro bombMock
         when(alienMock.getBomb()).thenReturn(bombMock);
 
         // Inyección de mocks en el tablero
@@ -46,109 +50,117 @@ public class BoardIntegrationTest {
         aliens.add(alienMock);
         board.setAliens(aliens);
 
-        // Configuraciones por defecto para evitar NullPointerExceptions durante update()
-        // Por defecto, asumimos que no hay colisiones ni muertes salvo que el test diga lo contrario
+        // Configuraciones por defecto (Happy Path)
         when(shotMock.isVisible()).thenReturn(false);
         when(playerMock.isVisible()).thenReturn(true);
         when(alienMock.isVisible()).thenReturn(true);
-        when(bombMock.isDestroyed()).thenReturn(true); // Por defecto bomba inactiva
+        when(bombMock.isDestroyed()).thenReturn(true);
+
+        // Valores por defecto para evitar NullPointers en cálculos matemáticos
+        when(shotMock.getX()).thenReturn(0);
+        when(shotMock.getY()).thenReturn(0);
+        when(alienMock.getX()).thenReturn(0);
+        when(alienMock.getY()).thenReturn(0);
     }
 
+    // -------------------------------------------------------------------------
+    // MM-PATH 1: Board -> Player (Delegación de acción)
+    // -------------------------------------------------------------------------
+
     /**
-     * Test de Integración para update_shots()
-     * Verifica la interacción Board -> Shot/Alien cuando hay colisión.
+     * Verifica que el ciclo de actualización del tablero invoca siempre
+     * al método act() del jugador.
      */
     @Test
-    public void testUpdateShots_Collision() {
-        // GIVEN: Disparo y Alien visibles y en la misma posición
-        when(shotMock.isVisible()).thenReturn(true);
+    public void testUpdate_PlayerActs() {
+        // WHEN
+        board.update();
 
-        int x = 100;
-        int y = 100;
+        // THEN
+        verify(playerMock, times(1)).act();
+    }
+
+    // -------------------------------------------------------------------------
+    // MM-PATH 2: Board -> Shot (Lógica de Movimiento y Colisión)
+    // -------------------------------------------------------------------------
+
+    /**
+     * Verifica la interacción Board -> Shot cuando NO hay colisión.
+     * El tablero debe calcular la nueva Y y actualizar el disparo.
+     */
+    @Test
+    public void testUpdateShots_Movement() {
+        // GIVEN: Disparo visible en posición (100, 100)
+        when(shotMock.isVisible()).thenReturn(true);
+        int initialY = 100;
+        when(shotMock.getY()).thenReturn(initialY);
+        when(shotMock.getX()).thenReturn(100);
+
+        // WHEN
+        board.update();
+
+        // THEN
+        // Board debe obtener Y, restar SHOT_SPEED y establecer la nueva Y
+        // Verificamos que se llama a setY con el valor esperado
+        int expectedY = initialY - Commons.SHOT_SPEED;
+        verify(shotMock).setY(expectedY);
+        // Aseguramos que NO muere si no hay colisión ni sale de pantalla
+        verify(shotMock, never()).die();
+    }
+
+    @Test
+    public void testUpdateShots_Collision() {
+        // GIVEN: Disparo y Alien visibles colisionando
+        when(shotMock.isVisible()).thenReturn(true);
+        int x = 100; int y = 100;
         when(shotMock.getX()).thenReturn(x);
         when(shotMock.getY()).thenReturn(y);
         when(alienMock.getX()).thenReturn(x);
         when(alienMock.getY()).thenReturn(y);
 
-        // WHEN: Ejecutamos el ciclo
+        // WHEN
         board.update();
 
-        // THEN: Verificar muerte del alien y del disparo
+        // THEN
         verify(alienMock).setDying(true);
         verify(shotMock).die();
     }
 
+    // -------------------------------------------------------------------------
+    // MM-PATH 3: Board -> Bomb (Gestión de gravedad)
+    // -------------------------------------------------------------------------
+
     /**
-     * Test de Integración para update_aliens() - Cambio de Dirección
-     * Verifica que Board detecta el borde y ordena a los aliens bajar y cambiar dirección.
+     * Verifica que Board mueve la bomba hacia abajo si está activa.
      */
     @Test
-    public void testUpdateAliens_BorderCollision() {
-        // GIVEN: Alien situado en el borde derecho
-        // Posición que activa la lógica: x >= BOARD_WIDTH - BORDER_RIGHT
-        int bordeDerecho = Commons.BOARD_WIDTH - Commons.BORDER_RIGHT;
-        when(alienMock.getX()).thenReturn(bordeDerecho);
-        when(alienMock.getY()).thenReturn(50); // Altura cualquiera
+    public void testUpdateBomb_Movement() {
+        // GIVEN: Bomba activa
+        when(bombMock.isDestroyed()).thenReturn(false);
+        int initialY = 50;
+        when(bombMock.getY()).thenReturn(initialY);
+        when(bombMock.getX()).thenReturn(50);
 
-        // Dirección actual inicial (hacia la derecha) para forzar el choque
-        // *Nota: Asumimos que la dirección inicial en Board podría ser -1 o 1.
-        // Para asegurar que entra en el if (direction != -1), forzamos dirección inicial si tuviéramos setter,
-        // o asumimos el estado por defecto. En Board.java direction inicia en -1 (izq),
-        // pero para probar el rebote a la derecha, el alien debe estar a la derecha.
-        // Vamos a probar el rebote izquierdo que es más natural con direction=-1.
-
-        // Probamos REBOTE IZQUIERDO (x <= BORDER_LEFT)
-        int bordeIzquierdo = Commons.BORDER_LEFT;
-        when(alienMock.getX()).thenReturn(bordeIzquierdo);
-        // Board se inicia con direction = -1, así que al tocar izquierda debería cambiar a 1
+        // Posicionamos al jugador lejos para evitar colisión en este test
+        when(playerMock.getX()).thenReturn(500);
+        when(playerMock.getY()).thenReturn(500);
 
         // WHEN
         board.update();
 
         // THEN
-        // 1. Verificar que se llama a setY para bajar al alien
-        // El valor exacto depende de la lógica, pero verificamos que se llamó al setter
-        verify(alienMock, atLeastOnce()).setY(anyInt());
-
-        // 2. Verificar que la dirección del tablero ha cambiado a 1 (Derecha)
-        assertEquals(1, board.getDirection(), "La dirección debería cambiar a derecha (1) tras tocar borde izquierdo");
+        // La bomba debe bajar (sumar BOMB_SPEED a Y)
+        int expectedY = initialY + Commons.BOMB_SPEED;
+        verify(bombMock).setY(expectedY);
     }
 
-    /**
-     * Test de Integración para update_aliens() - Invasión
-     * Verifica que si un alien toca el suelo, el juego termina.
-     */
-    @Test
-    public void testUpdateAliens_Invasion() {
-        // GIVEN: Alien situado a la altura del suelo
-        // y > GROUND + ALIEN_HEIGHT
-        int alturaInvasion = Commons.GROUND + Commons.ALIEN_HEIGHT + 1;
-        when(alienMock.getY()).thenReturn(alturaInvasion);
-
-        // WHEN
-        board.update();
-
-        // THEN
-        assertFalse(board.isInGame(), "El juego debería terminar (inGame=false) si un alien invade");
-        assertEquals("Invasion!", board.getMessage(), "El mensaje debería ser de Invasión");
-    }
-
-    /**
-     * Test de Integración para update_bomb()
-     * Verifica que si una bomba activa toca al jugador, este muere.
-     */
     @Test
     public void testUpdateBomb_PlayerCollision() {
-        // GIVEN: Bomba activa (no destruida) en la posición del jugador
+        // GIVEN: Bomba activa sobre el jugador
         when(bombMock.isDestroyed()).thenReturn(false);
-
-        int playerX = 200;
-        int playerY = 280;
-
+        int playerX = 200; int playerY = 280;
         when(playerMock.getX()).thenReturn(playerX);
         when(playerMock.getY()).thenReturn(playerY);
-
-        // La bomba está en las mismas coordenadas
         when(bombMock.getX()).thenReturn(playerX);
         when(bombMock.getY()).thenReturn(playerY);
 
@@ -156,24 +168,55 @@ public class BoardIntegrationTest {
         board.update();
 
         // THEN
-        verify(playerMock).setDying(true);  // El jugador debe morir
-        verify(bombMock).setDestroyed(true); // La bomba se destruye al impactar
+        verify(playerMock).setDying(true);
+        verify(bombMock).setDestroyed(true);
     }
 
-    /**
-     * Test de Integración para update() - Condición de Victoria
-     * Verifica que Board detiene el juego cuando se matan todos los aliens.
-     */
+    // -------------------------------------------------------------------------
+    // MM-PATH 4: Board -> Alien (Coordinación de grupo)
+    // -------------------------------------------------------------------------
+
+    @Test
+    public void testUpdateAliens_BorderCollision() {
+        // GIVEN: Alien en el borde izquierdo
+        // Board inicia con direction = -1 (Izquierda)
+        int bordeIzquierdo = Commons.BORDER_LEFT;
+        when(alienMock.getX()).thenReturn(bordeIzquierdo);
+
+        // WHEN
+        board.update();
+
+        // THEN
+        // Verificar cambio de dirección en Board (debe ser 1 -> Derecha)
+        assertEquals(1, board.getDirection(), "La dirección debe cambiar a derecha al tocar borde izquierdo");
+        // Verificar que se ordena bajar a los aliens
+        verify(alienMock, atLeastOnce()).setY(anyInt());
+    }
+
+    @Test
+    public void testUpdateAliens_Invasion() {
+        // GIVEN: Alien invadiendo (tocando suelo)
+        int alturaInvasion = Commons.GROUND + Commons.ALIEN_HEIGHT + 1;
+        when(alienMock.getY()).thenReturn(alturaInvasion);
+
+        // WHEN
+        board.update();
+
+        // THEN
+        assertFalse(board.isInGame());
+        assertEquals("Invasion!", board.getMessage());
+    }
+
     @Test
     public void testUpdate_WinCondition() {
-        // GIVEN: Contador de muertes igual al total de aliens
+        // GIVEN: Todos los aliens destruidos
         board.setDeaths(Commons.NUMBER_OF_ALIENS_TO_DESTROY);
 
         // WHEN
         board.update();
 
         // THEN
-        assertFalse(board.isInGame(), "El juego debería terminar si se eliminan todos los aliens");
+        assertFalse(board.isInGame());
         assertEquals("Game won!", board.getMessage());
     }
 }

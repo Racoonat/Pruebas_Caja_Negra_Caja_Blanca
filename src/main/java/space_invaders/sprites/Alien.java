@@ -44,21 +44,8 @@ public class Alien extends Sprite {
      * y su posición es válida dentro del tablero de juego.</dd></dl>
      */
      private void initAlien(int x, int y) {
-
-        if (x> Commons.BOARD_WIDTH){
-            this.x = Commons.BOARD_WIDTH;
-        } if (x<0){
-            this.x = 0;
-        } if (y> Commons.BOARD_HEIGHT){
-            this.y = Commons.BOARD_HEIGHT;
-        } if (y<0){
-            this.y=0;
-        }
-        else
-        {
-            this.x = x;
-            this.y = y;
-        }
+         this.x = x > Commons.BOARD_WIDTH ? Commons.BOARD_WIDTH : Math.max(x, 0);
+         this.y = y > Commons.BOARD_HEIGHT ? Commons.BOARD_HEIGHT : Math.max(y, 0);
 
         bomb = new Bomb(x, y);
 

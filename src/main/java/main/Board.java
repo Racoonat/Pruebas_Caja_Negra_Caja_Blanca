@@ -7,11 +7,7 @@ import space_invaders.sprites.Shot;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.Timer;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -38,8 +34,6 @@ import java.util.Random;
  * @version 1.0
  */
 public class Board extends JPanel {
-
-    private Dimension d;
     private List<Alien> aliens;
     private Player player;
     private Shot shot;
@@ -103,7 +97,6 @@ public class Board extends JPanel {
 
         addKeyListener(new TAdapter());
         setFocusable(true);
-        d = new Dimension(Commons.BOARD_WIDTH, Commons.BOARD_HEIGHT);
         setBackground(Color.black);
 
         timer = new Timer(Commons.DELAY, new GameCycle());
@@ -219,10 +212,30 @@ public class Board extends JPanel {
      * <br><br><span class="alert">⛔🧪 No es necesario probar este método mediante pruebas unitarias.</span>
      */
     @Override
-    public void paintComponent(Graphics g) {
+    protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        doDrawing(g);
+        Graphics2D g2d = (Graphics2D) g.create();
+
+        double scaleX = getWidth() / (double) Commons.BOARD_WIDTH;
+        double scaleY = getHeight() / (double) Commons.BOARD_HEIGHT;
+        double scale = Math.min(scaleX, scaleY);
+
+        // Centrar el tablero
+        int xOffset = (int) ((getWidth() - Commons.BOARD_WIDTH * scale) / 2);
+        int yOffset = (int) ((getHeight() - Commons.BOARD_HEIGHT * scale) / 2);
+
+        g2d.translate(xOffset, yOffset);
+        g2d.scale(scale, scale);
+
+        doDrawing(g2d);
+        g2d.dispose();
+    }
+
+
+    @Override
+    public Dimension getPreferredSize() {
+        return new Dimension(Commons.BOARD_WIDTH, Commons.BOARD_HEIGHT);
     }
 
     /**
@@ -232,7 +245,7 @@ public class Board extends JPanel {
     private void doDrawing(Graphics g) {
 
         g.setColor(Color.black);
-        g.fillRect(0, 0, d.width, d.height);
+        g.fillRect(0, 0, Commons.BOARD_WIDTH, Commons.BOARD_HEIGHT);
         g.setColor(Color.green);
 
         if (inGame) {
@@ -610,26 +623,6 @@ public class Board extends JPanel {
                 }
             }
         }
-    }
-
-    /**
-     * {@summary <span class="alert-small">⛔🧪</span> Obtiene las dimensiones del tablero de juego.}
-     * 
-     * <br><br><span class="alert">⛔🧪 No es necesario probar el método mediante pruebas unitarias.</span>
-     * @return las dimensiones del tablero
-     */
-    public Dimension getD() {
-        return d;
-    }
-
-    /**
-     * {@summary <span class="alert-small">⛔🧪</span> Establece las dimensiones del tablero de juego.}
-     * 
-     * <br><br><span class="alert">⛔🧪 No es necesario probar el método mediante pruebas unitarias.</span>
-     * @param d las nuevas dimensiones del tablero
-     */
-    public void setD(Dimension d) {
-        this.d = d;
     }
 
     /**

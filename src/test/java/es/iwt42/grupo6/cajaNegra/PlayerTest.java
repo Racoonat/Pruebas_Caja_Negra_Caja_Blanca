@@ -29,8 +29,8 @@ class PlayerTest {
     @Test
     void testInitPlayer_Centrado() {
         // ancho tablero par
-        int expectedX = Commons.BOARD_WIDTH / 2; // centrado
-        int expectedY = Commons.GROUND - 10; // 10 px sobre el suelo
+        int expectedX = (Commons.BOARD_WIDTH / 2) - Commons.PLAYER_WIDTH; // centrado
+        int expectedY = (Commons.GROUND - 10) - Commons.PLAYER_HEIGHT; // 10 px sobre el suelo
         assertEquals(expectedX, player.getX(), "X inicial del jugador incorrecto (TS1)");
         assertEquals(expectedY, player.getY(), "Y inicial del jugador incorrecto (TS1)");
     }
@@ -39,8 +39,8 @@ class PlayerTest {
     void testInitPlayer_CentradoImpar() {
         // hacemos que BOARD_WIDTH sea impar
         int boardWidthOdd = Commons.BOARD_WIDTH + 1; // simulamos ancho impar
-        int expectedX = boardWidthOdd / 2; // centrado visualmente
-        int expectedY = Commons.GROUND - 10; // 10 px sobre el suelo
+        int expectedX = (boardWidthOdd / 2) - Commons.PLAYER_WIDTH; // centrado visualmente
+        int expectedY = (Commons.GROUND - 10) - Commons.PLAYER_HEIGHT; // 10 px sobre el suelo
         // comprobamos que la X calculada sigue estando centrada
         assertTrue(Math.abs(player.getX() - expectedX) <= 1,
                 "X inicial del jugador incorrecto (TS2, ancho impar)");

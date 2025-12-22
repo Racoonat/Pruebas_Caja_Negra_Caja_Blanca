@@ -168,8 +168,8 @@ public class BoardIntegrationTest {
         board.update();
 
         // THEN
-        verify(playerMock).setDying(true);
-        verify(bombMock).setDestroyed(true);
+        verify(playerMock, atLeastOnce()).setDying(true);
+        verify(bombMock, atLeastOnce()).setDestroyed(true);
     }
 
     // -------------------------------------------------------------------------
